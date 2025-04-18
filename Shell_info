@@ -1,0 +1,212 @@
+Day 1. Introduction to Shell and Environment setup
+
+        - Linux:   
+            Application
+
+            Shell
+
+            Kernal   (Understand C Lang)
+
+            Hardware
+
+        - Shell Script is collenction of Shell Commands
+
+        - Stive Born ----> Shell ----> (sh)   /bin/sh  ----> Born Again Shell (BASH)  ----> /bin/bash
+
+            eg. csh, ksh, Fish
+
+        - .sh file will always start with [#!/bin/bash] this reflect like the .sh file will run on "Bash" shell.
+
+            #!/bin/bash = Uses Bash Shell
+            #!/bin/sh = Uses Bourne shell
+            #!/usr/bin/env python3 = Uses Python3
+            #!/usr/bin/env node =  Uses Node.js
+
+        - It also called "shebang" which tells interpreter
+        
+        - Allow file to run, give needed permissions
+
+
+Day 2. Basic Scripting Skills
+
+    - Variables:
+        
+        << comment
+         This block is for multi line comment in shell script
+        comment
+
+        name  = "Yogesh"
+        echo "Hello $name and date is $(date)"
+
+        read username
+        echo "You entered $username"
+
+        read "Enter Name " my_name
+        echo "Your name is $my_name"
+
+        - To run linux cmd wrape it within a () paranthesis
+        - To take input from user we use read.
+
+    - Arguments:
+
+        ./hello.sh  _   _   _   _   _
+            $0      $1  $2  $3  $4  $5
+        
+        - So the above are arguments file name is argument at 0th position and after that we can pass any number of argument as per our requirement.
+
+        - $@ = It means ki you can pass multiple arguments
+
+
+
+    - Conditional Statements
+
+        if [[ $name == "Yogesh"]];
+        then    
+                echo "You are right"
+
+        elif [[$age -ge 18]];
+        then
+                echo "You are right"
+
+        else
+                echo "You are wrong"
+        fi
+
+        -eq | Equal
+        -ne | Not equal
+        -gt | Greater than
+        -lt | Less than
+        -ge | Greater or equal
+        -le | Less or equal
+        -z "$str" | String is empty
+        -n "$str" | String is not empty
+        -f file.txt | File exists
+        -d folder/ | Directory exists
+    
+    - Loops:
+
+        1] For Loop:
+
+            for ((num=1; num<=5; num++>))
+            do
+                    echo "Hello $num"
+            done
+        
+        2] While Loop
+
+            num = 0
+            while [[$num -le 5]]
+            do 
+                    echo "Hello $num"
+                    num = $((num+1))
+            done
+
+    - Functions:
+
+        # Fucntions Defination
+        function is_active(){
+            # write your code here
+        }
+
+        # Fuctions Calling
+        is_active  
+
+        # Calling fuctions with arguments & we can use it inside function
+        is_active arg1 arg2
+
+Day 3. Intermediate Scripting Techniques
+
+    - Error Handling:
+
+        create_directory(){
+            mkdir demo
+        }
+
+        if ! create_directory;
+        then    
+            echo "The Folder is already exist"
+            exit 1
+        fi
+
+        echo "I am running"
+
+        - In above case error is handling through if conditional statements
+        - set -euo pipefail  (This is the flag which will butify our errors so just add it in your script file)
+
+Day 4. Advanced Scripting and Debugging
+
+    - 
+
+Day 5. Real-World Applications and Integration:
+
+    - MakeFiles:
+        
+        Makefile:
+        
+            DOCKER_COMPOSE := docker-compose
+            OS := $(shell uname)
+
+            build: 
+            ifeq ($(OS), LINUX)
+                    @echo "Running $(OS)"
+                    $(DOCKER_COMPOSE) build
+            endif
+            
+            up:     
+                    $(DOCKER_COMPOSE) up -d
+
+            down:   
+                    $(DOCKER_COMPOSE) down
+            
+            clean:
+                    docker system prune
+
+        - Now we can run cmds like 
+        make up ---> To run the docker container
+        make down ---> To down the container
+    
+    - Backup & Rotation:
+
+        << readme
+        This is backup file with rotation
+        readme
+
+        function display_usage() {
+            echo "Usage: ./backup.sh <path of source> <path of backup folder>"
+        }
+
+        if [$# -eq 0]; then
+                display_usage
+        fi
+        
+        source_dir = $1
+        backup_dir = $2
+        timestamp = $(date '+%Y-%m-%d-%H-%M-%S')
+        
+        function backup_created () {
+
+            zip -r "${backup_dir}/backup_${timestamp}.zip" "${source_dir}"  >dev/null
+            
+            if [$? -eq 0]; then
+                echo "Backup Generated Successfully"
+            fi
+        }
+
+        function perform_rotation () {
+            backups = ($(ls -t "${backup_dir}/backup_"*.zip 2>dev/null))
+
+            if [["${#backups[@]}" -gt 5]]; then
+                
+                echo "Performing rotation for 5 days"
+
+                backups_to_remove = ("${backups[@]:5}")
+
+                for backup in "${backups_to_remove[@]}";
+                do  
+                        rm -f ${backup}
+                done
+            fi
+        }
+        
+        backup_created
+        perform_rotation
